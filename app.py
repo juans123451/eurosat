@@ -1,16 +1,8 @@
 import streamlit as st
-import tensorflow as tf
 import numpy as np
 from PIL import Image
+import tf_keras as keras
 
-# ── Configuración de la página ──────────────────────────────────────────────
-st.set_page_config(
-    page_title="EuroSAT Clasificador",
-    page_icon="🛰️",
-    layout="centered"
-)
-
-# ── Clases del modelo ────────────────────────────────────────────────────────
 CLASES = [
     {"nombre": "Tierra de Cultivo Anual",      "emoji": "🌾", "estado": "✅ Terreno natural"},
     {"nombre": "Tierra de Cultivo Permanente", "emoji": "🍇", "estado": "✅ Terreno natural"},
@@ -24,25 +16,19 @@ CLASES = [
     {"nombre": "Vegetación Arbustiva",         "emoji": "🌵", "estado": "✅ Terreno natural"},
 ]
 
-# ── Cargar modelo (solo una vez) ─────────────────────────────────────────────
-@st.cache_resource
-def cargar_modelo():
-    model = tf.keras.models.load_model("modelo_final_eurosat.keras")
-    return model
-
-# ── Interfaz ─────────────────────────────────────────────────────────────────
+st.set_page_config(page_title="EuroSAT Clasificador", page_icon="🛰️", layout="centered")
 st.title("🛰️ EuroSAT Clasificador")
 st.caption("Análisis de imágenes satelitales con Inteligencia Artificial")
 st.divider()
 
+@st.cache_resource
+def cargar_modelo():
+    return keras.models.load_model("modelo_final_eurosat.keras")
+
 with st.spinner("Cargando modelo de IA..."):
     modelo = cargar_modelo()
 
-imagen_subida = st.file_uploader(
-    "📤 Sube una imagen satelital",
-    type=["jpg", "jpeg", "png"],
-    help="Sube una imagen satelital para clasificarla"
-)
+imagen_subida = st.file_uploader("📤 Sube una imagen satelital", type=["jpg", "jpeg", "png"])
 
 if imagen_subida:
     imagen = Image.open(imagen_subida).convert("RGB")
